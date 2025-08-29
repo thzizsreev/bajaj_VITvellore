@@ -33,7 +33,7 @@ function buildConcatString(alphaItems) {
     .join("");
 }
 
-app.post("/test", (req, res) => {
+app.post("/bfhl", (req, res) => {
   try {
     const { data } = req.body ?? {};
     if (!Array.isArray(data)) {
