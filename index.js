@@ -8,26 +8,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Helpers
-const isNumericString = (s) => /^[+-]?\d+$/.test(s);  // integers as strings
-const isAlphaString   = (s) => /^[A-Za-z]+$/.test(s); // letters only
+
+const isNumericString = (s) => /^[+-]?\d+$/.test(s);  
+const isAlphaString   = (s) => /^[A-Za-z]+$/.test(s); 
 const isAlnum         = (s) => /^[A-Za-z0-9]+$/.test(s);
 
-// Build concat_string:
-// 1) Take all alphabetic characters across all items (character by character),
-// 2) reverse the resulting sequence,
-// 3) apply alternating caps starting with UPPER at index 0.
+
 function buildConcatString(alphaItems) {
-  // Flatten characters preserving original order within each string
   const chars = [];
   for (const word of alphaItems) {
     for (const ch of word) {
       if (/[A-Za-z]/.test(ch)) chars.push(ch);
     }
   }
-  // Reverse order
+ 
   chars.reverse();
-  // Alternating caps (start uppercase)
+  
   return chars
     .map((ch, idx) => (idx % 2 === 0 ? ch.toUpperCase() : ch.toLowerCase()))
     .join("");
@@ -64,11 +60,11 @@ app.post("/bfhl", (req, res) => {
     let sum = 0;
 
     for (const item of data) {
-      // We expect inputs as strings per examples. If not string, coerce.
+      
       const s = String(item);
 
       if (isNumericString(s)) {
-        // numbers as strings in output (as required)
+        
         const num = parseInt(s, 10);
         sum += num;
         if (Math.abs(num) % 2 === 0) {
@@ -79,8 +75,7 @@ app.post("/bfhl", (req, res) => {
       } else if (isAlphaString(s)) {
         alphasUpper.push(s.toUpperCase());
       } else {
-        // Not purely alnum -> treat as special characters (the whole token)
-        // The examples show tokens like "&", "-", "*", "$" grouped as specials.
+        
         if (!isAlnum(s)) specials.push(s);
       }
     }
@@ -100,7 +95,7 @@ app.post("/bfhl", (req, res) => {
       concat_string
     });
   } catch (err) {
-    // Graceful error handling (still return 200 with is_success=false per spec emphasis on 200)
+    
     return res.status(200).json({
       is_success: false,
       user_id: null,
@@ -117,7 +112,7 @@ app.post("/bfhl", (req, res) => {
   }
 });
 
-// Health check (optional)
+
 app.get("/", (_req, res) => {
   res.status(200).send("VIT  API is running. POST /bfhl");
 });
